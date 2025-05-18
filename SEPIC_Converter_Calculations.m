@@ -1,0 +1,130 @@
+% SEPIC Converter Design Calculator
+clc; clear;
+
+%% -------- Input Parameters --------
+Vout    = 9000;          % Output voltage in Volts
+Vin_min = 1000;          % Minimum input voltage in Volts
+Vin_max = 1000;          % Maximum input voltage in Volts
+Iout    = 20000 / 9000;  % Output current in Amps
+Vd      = 0.7;           % Diode forward voltage in Volts
+fsw     = 300e3;         % Switching frequency in Hz
+eff     = 1;             % Estimated efficiency (as decimal)
+
+K_ind = 0.2;             % 20% ripple current (KIND)
+areInductorsCoupled = true;   % Set to true if L1/L2 are coupled on the same core
+
+Rds_on  = 37e-3;    % MOSFET on-state resistance [Ohms]
+Qgd      = 2.3e-9;    % Total gate charge [C]
+Ig      = 1.175;     % Gate drive current [A] % Ig = Qg / min(trise, tfall)
+
+V_ripple = 0.05;         % Desired output voltage ripple in Volts (peak-peak)
+
+%% -------- Ripple current and Inductance Calculations --------
+
+% Equation (1) - Duty cycle (at min Vin)
+D = (Vout + Vd) / (Vin_min + Vout + Vd);
+
+% Equation (2) - Maximum duty cycle
+D_max = (Vout + Vd) / (Vin_min + Vout + Vd);
+
+% Equation (3) - Inductor ripple current
+IL_avg = Iout / eff;                        % Average input current
+delta_IL = K_ind * IL_avg * (Vout / Vin_min); % Peak-to-peak ripple current
+
+% Equation (4) - Inductor value (L1 = L2)
+%L = (Vin_min * D_max) / (delta_IL * fsw);
+
+% Equation (5 & 6) - Peak inductor currents
+IL1_peak = Iout * ( (Vout + Vd) / Vin_min) * (1 + (K_ind/2));
+IL2_peak = Iout * (1 + (K_ind/2));
+
+% Equation (7) - Coupled inductance value (for both inductors with same core)
+%L_coupled = (Vin_min * D_max) / (2 * delta_IL * fsw);
+
+if areInductorsCoupled
+    % Equation 7 (Note: Original text claims "I_in" is switching frequency, likely a typo)
+    % Assumes denominator uses fsw instead of I_in for unit consistency
+    L = (Vin_min * D_max) / (2 * delta_IL * fsw);
+else
+    % Equation 4 (Note: Unit inconsistency - missing switching frequency)
+    L = (Vin_min * D_max) / (delta_IL * fsw);
+end
+
+%% -------- Ripple current and Inductance Results Display --------
+
+fprintf('=== Ripple current and Inductance Calculations ===\n');
+fprintf('Duty Cycle D: %.3f\n', D);
+fprintf('Maximum Duty Cycle D_max: %.3f\n', D_max);
+fprintf('Peak-to-Peak Inductor Ripple Current (ΔIL): %.3f A\n', delta_IL);
+fprintf('Inductor Value L1 = L2: %.3f uH\n', L * 1e6);
+fprintf('Inductor L1 Peak Current: %.3f A\n', IL1_peak);
+fprintf('Inductor L2 Peak Current: %.3f A\n', IL2_peak);
+%fprintf('Coupled Inductance (L*): %.3f uH\n', L_coupled * 1e6);
+
+%% -------- MOSFET and Diode Calculations --------
+
+% Equation (8) - Peak Switch Current
+Isw_peak = IL1_peak + IL2_peak;
+
+% Equation (9) - RMS Switch Current
+Isw_rms = Iout * sqrt(((Vin_min + Vout + Vd) * (Vout + Vd)) / Vin_min^2);
+
+% Equation (10) - Power Dissipation in MOSFET
+PQ1 = (Isw_rms^2 * Rds_on * D_max) + (((Vin_min + Vout) * Isw_peak * (Qgd * fsw)) / Ig);
+
+% Conduction losses
+PQ1_cond = (Isw_rms^2 * Rds_on * D_max);
+
+% Switching losses
+PQ1_Switch = (((Vin_min + Vout) * Isw_peak * (Qgd * fsw)) / Ig);
+
+% Output Diode peak current Rating
+Id1_peak = Isw_peak;
+
+% Equation (11) - Output Diode Reverse Voltage Rating
+VR_D1 = Vin_max + Vout;
+
+% the Power dissipation of the output diode
+PD1 = Iout * Vd;
+
+%% -------- MOSFET and Diode Results Display --------
+
+fprintf('\n');
+fprintf('=== Power MOSFET & Diode Selection ===\n');
+fprintf('Peak Switch Current (I_Q1_peak): %.3f A\n', Isw_peak);
+fprintf('RMS Switch Current (I_Q1_rms): %.3f A\n', Isw_rms);
+fprintf('MOSFET Power Dissipation (PQ1): %.3f W\n', PQ1);
+fprintf('MOSFET Conduction losses (PQ1): %.3f W\n', PQ1_cond);
+fprintf('MOSFET Switching losses (PQ1): %.3f W\n', PQ1_Switch);
+fprintf('Output Diode Peak Current Rating (I_D1_peak): %.3f A\n', Id1_peak);
+fprintf('Output Diode Reverse Voltage Rating (V_R_D1): %.1f V\n', VR_D1);
+fprintf('Power dissipation of the output diode (P_D1): %.3f W\n', PD1);
+
+
+%% --- SEPIC Coupling Capacitor Calculations ---
+I_Cs_rms = Iout * sqrt((Vout + Vd) / Vin_min); % Eq. (12)
+%delta_V_Cs = Iout * D_max / (I_Cs_rms * fsw);    % Eq. (13), assuming no ESR
+delta_V_Cs = Vin_max * 0.05;
+Cs_required = (Iout * D_max) / (0.05 * Vin_max * fsw);
+
+%% --- Output Capacitor Calculations ---
+I_Cout_rms = Iout * sqrt((Vout + Vd) / Vin_min);  % Eq. (14)
+delta_V_Cout = Vout * 0.01;
+ESR_required = (delta_V_Cout * 0.5) / (IL1_peak + IL2_peak); % Eq. (15)
+Cout_required = (Iout * D_max) / (delta_V_Cout * 0.5 * fsw); % Eq. (16)
+
+%% --- Capacitor Calculation Display Results ---
+fprintf('\n');
+fprintf('SEPIC Coupling Capacitor Calculations:\n');
+fprintf('--------------------------------------\n');
+fprintf('RMS Current through Cs (I_Cs_rms): %.3f A\n', I_Cs_rms);
+fprintf('Peak-to-peak ripple voltage on Cs (ΔV_Cs) should be less than : %.3f V\n', delta_V_Cs);
+fprintf('Required Coupling Capacitance (Cs) should be greater thasn : %.3e (%.2f uF) (%.3f nF) \n', Cs_required, Cs_required * 1e6, Cs_required * 1e9);
+fprintf('\n');
+
+fprintf('Output Capacitor Calculations:\n');
+fprintf('------------------------------\n');
+fprintf('RMS Current through Cout (I_Cout_rms): %.3f A\n', I_Cout_rms);
+fprintf('Peak-to-peak ripple voltage on Cout (ΔV_Cout) should be less than : %.3f V\n', delta_V_Cout);
+fprintf('Required ESR: %.3f Ohms\n', ESR_required);
+fprintf('Required Output Capacitance (Cout) should be greater than : %.3e F (%.2f uF) (%.2f nF)\n', Cout_required, Cout_required*1e6, Cout_required*1e9);
