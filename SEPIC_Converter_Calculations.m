@@ -118,13 +118,25 @@ fprintf('\n');
 fprintf('SEPIC Coupling Capacitor Calculations:\n');
 fprintf('--------------------------------------\n');
 fprintf('RMS Current through Cs (I_Cs_rms): %.3f A\n', I_Cs_rms);
-fprintf('Peak-to-peak ripple voltage on Cs (ΔV_Cs) should be less than : %.3f V\n', delta_V_Cs);
-fprintf('Required Coupling Capacitance (Cs) should be greater thasn : %.3e (%.2f uF) (%.3f nF) \n', Cs_required, Cs_required * 1e6, Cs_required * 1e9);
+fprintf('Peak-to-peak ripple voltage on Cs (ΔV_Cs) should be less than or equal to : %.3f V\n', delta_V_Cs);
+fprintf('Required Coupling Capacitance (Cs) should be greater thas or equal to : %.3e (%.2f uF) (%.3f nF) \n', Cs_required, Cs_required * 1e6, Cs_required * 1e9);
 fprintf('\n');
 
 fprintf('Output Capacitor Calculations:\n');
 fprintf('------------------------------\n');
 fprintf('RMS Current through Cout (I_Cout_rms): %.3f A\n', I_Cout_rms);
-fprintf('Peak-to-peak ripple voltage on Cout (ΔV_Cout) should be less than : %.3f V\n', delta_V_Cout);
-fprintf('Required ESR: %.3f Ohms\n', ESR_required);
-fprintf('Required Output Capacitance (Cout) should be greater than : %.3e F (%.2f uF) (%.2f nF)\n', Cout_required, Cout_required*1e6, Cout_required*1e9);
+fprintf('Peak-to-peak ripple voltage on Cout (ΔV_Cout) should be less than or equal to: %.3f V\n', delta_V_Cout);
+fprintf('Required ESR should be less than or equal to : %.3f Ohms\n', ESR_required);
+fprintf('Required Output Capacitance (Cout) should be greater than or equal to : %.3e F (%.2f uF) (%.2f nF)\n', Cout_required, Cout_required*1e6, Cout_required*1e9);
+fprintf('\n');
+
+%% ----------- Input Capacitor Selection for SEPIC Converter ----------------
+I_Cin_rms = delta_IL / sqrt(12);  % Eq. (17)
+Cin_required = 40e-6;
+
+% --- Display Result ---
+fprintf('Input Capacitor RMS Current Calculation:\n');
+fprintf('----------------------------------------\n');
+fprintf('Inductor Current Ripple (ΔIL): %.2f A\n', delta_IL);
+fprintf('RMS Current through Input Capacitor (I_CIN_rms): %.3f A\n', I_Cin_rms);
+fprintf('Required Input Capacitance (Cin) should be greater than or equal to : %.3e F (%.2f uF) (%.2f nF)\n', Cin_required, Cin_required*1e6, Cin_required*1e9);
