@@ -53,8 +53,8 @@ Lr = A * Cr;
 
 % Display results
 fprintf('Calculated Cr = %.3e F\n', Cr);
-fprintf('Calculated Lr = %.3e H\n', Lr);
+fprintf('Calculated Lr primary = %.3e H\n', Lr);
 
 % Calculate Lm using m
 Lm = Lr * (m - 1);
-fprintf('Lm = %.2e H\n', Lm);
+fprintf('Lm primary = %.2e H\n', Lm);
