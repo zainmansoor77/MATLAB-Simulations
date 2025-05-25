@@ -1,0 +1,28 @@
+clc;
+
+B = 4;      % flux density (B) in Tesla
+Ac = 1;    % cross-sectional area (A_c) in m²
+U0 = 4 * pi * 1e-7; % Permeability of free space [H/m]
+Ur = 1;     % relative permeability 
+i = 1;      % winding current (i) in Amperes
+lm = 1;     % core length (l_m) in meters
+n = 1;      % number of turns
+
+% Calculate magnetic flux (Phi)
+Phi = B * Ac;
+
+% Compute magnetic field strength (H)
+H = (n * i) / lm; % [A/m]
+
+% Linear model (no saturation)
+B_linear = U0 * Ur * H;
+
+
+
+
+%%  Display flux result
+fprintf('\nMagnetic Flux (Φ): %.4f Weber (Wb)\n', Phi);
+%% Display Results for Input Current
+fprintf('\n--- Results for Input Current ---\n');
+fprintf('Magnetic Field Strength (H): %.2f A/m\n', H);
+fprintf('Linear Model Flux Density (B_linear): %.9f T (%.3f uT) \n', B_linear, B_linear * 1e6);
