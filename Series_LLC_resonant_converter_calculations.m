@@ -1,18 +1,18 @@
 clc;
 
 % Parameters
-m = 8; % previous value = 8
-Q = 0.5; % previous val = 0.6
+m = 12; % previous value = 8
+Q = 0.1; % previous val = 0.6
 
 Np = 1;          % Primary turns
 Ns = 100;        % Secondary turns
 Vo = 3e3;       % Output voltage in Volts
 Po_max = 300;    % Max output power in Watts
 Qmax = Q;        % Quality factor (already given)
-fr = 120e3;       % Resonant frequency (Hz)
+fr = 10e3;       % Resonant frequency (Hz)
 %R0 = 1000e3;
 
-Fx = linspace(0, 10, 10000); % Sweep Fx from 0 to 50
+Fx = linspace(0.1, 10.0, 10000); % Sweep Fx from 0 to 50
 
 % Equation from image
 numerator = Fx.^2 .* (m - 1);
