@@ -1,0 +1,25 @@
+clc;
+
+K_fe = 1;     % Kf e is a constant of proportionality which depends on the operating frequency. (Core loss coefficient) ( material constant)
+delta_B = 1;  % peak ac flux density (ΔB) in Tesla
+beta = 1;     % material constant
+Ac = 1;       % cross-sectional core area (Ac) in m²
+lm = 1;       % core length (lm) in meters
+n1 = 1;       % primary turns n1
+lamda1 = 1;   % Volts second blance in V-sec
+
+% Calculate peak ac flux density (ΔB) in Tesla
+delta_B = lamda1 / (2 * n1 * Ac);
+
+fprintf('\npeak ac flux density (ΔB): %.4f V-sec\n', delta_B);
+
+% Calculate primary turns n1
+n1 = lamda1 / (2 * n1 * Ac);
+
+fprintf('\npeak ac flux density (ΔB): %.4f V-sec\n', delta_B);
+
+
+% Calculate core loss
+P_fe = K_fe * (delta_B)^beta * Ac * lm; % Eq. 12.1
+
+fprintf('Total Core Loss (P_fe): %.4f W\n', P_fe);

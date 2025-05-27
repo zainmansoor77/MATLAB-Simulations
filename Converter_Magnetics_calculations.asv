@@ -7,9 +7,10 @@ Ag = 0.1;   % cross-sectional core air gap area (Ag) in m²
 U0 = 4 * pi * 1e-7; % Permeability of free space [H/m]
 Ur = 1;     % relative permeability 
 i = 1;      % winding current (i) in Amperes
+I_rms = 1;  % RMS current
 lm = 1;     % core length (lm) in meters
 lg = 0.1;   % air gap length (lg) in meters
-n = 1;      % number of turns
+n = 3;      % number of turns
 n1 = 1;     % primary turns (n1)
 n2 = 1;     % secondary turns (n2)
 i1 = 1;     % primary current (i1) in A
@@ -20,8 +21,13 @@ Ll2 = 1;    % Secondary Leakage Inductance
 L12_choice = 1; % 1 for  L12 = (n1 * n2) / R; 2 for L12 = (n2 / n1) * L_M;
 K_fe = 1;   % material constant
 beta = 1;   % material constant
-
-
+delta_B = 1;% peak ac flux density (ΔB) in Tesla
+MLT = 0.15;             % Mean Length per Turn [m]
+AWG = 24;               % American Wire Gauge [] % diameter of the conductor is calculated with the AWG
+h = 0.5;                % height (or thickness) of the conductor layer in the direction perpendicular to the surface where the current flows
+temp = 100;             % Temperature [°C]
+rho_20C = 1.724e-8;     % Copper resistivity at 20°C [Ω-m]
+f = 100e3;              % Frequency [Hz]
 
 
 % Calculate magnetic flux (Phi)
@@ -59,8 +65,8 @@ MMF_total = n * i; % Total MMF (nI) [A-turns]
 Phi = MMF_total / R_total; 
 
 % 4. Compute MMF drops across core and air gap
-MMF_core = Phi * R_core; % MMF across core
-MMF_airgap = Phi * R_airgap; % MMF across air gap
+MMF_core = Phi * Rc; % MMF across core
+MMF_airgap = Phi * Rg; % MMF across air gap
 
 % 5. Validate MMF_total = MMF_core + MMF_airgap
 MMF_error = abs(MMF_total - (MMF_core + MMF_airgap));
@@ -117,6 +123,51 @@ k = L12 / sqrt(L11 * L22);
 
 % Calculate core loss
     P_fe = K_fe * (delta_B)^beta * Ac * lm; % Eq. 10.57
+
+%% Wire Dimensions
+% AWG to diameter conversion (from table)
+dia = (0.127*92.^((36-AWG)/39))/1000; % Diameter in meters
+A_w = pi*(dia/2)^2;     % Wire cross-sectional area [m²]
+
+% Temperature Adjustment for Resistivity
+rho = rho_20C*(1 + 0.00393*(temp - 20)); % Temperature coefficient for copper
+
+% DC Resistance Calculation
+R_dc = rho * (n * MLT) / A_w;
+P_cu = I_rms^2 * R_dc;
+
+% Skin Effect Analysis
+skin_depth = sqrt(rho/(pi*f*U0*Ur)); % Standard skin depth formula
+
+% Calculate AC resistance (Equation 10.63)
+R_ac = (h / skin_depth) * R_dc;
+
+% Calculate copper loss in layer 1 (Equation 10.64)
+P_1 = i^2 * R_ac;
+
+% Pre-calculate Common Factor
+common_factor = I_rms^2 * (h/skin_depth) * R_dc;
+
+% Calculate Loss for Each Layer
+layer_copper_losses = zeros(1, n);
+for m = 1:n
+    layer_copper_losses(m) = common_factor * ((m-1)^2 + m^2);
+end
+
+% Calculate Total Copper Loss
+P_ = sum(layer_copper_losses);
+
+% Equation Implementation
+term1 = I_rms^2;                    % Current squared term
+term2 = (h / skin_depth) * R_dc;            % Geometry/resistance factor
+term3 = n/3;                    % Layer scaling factor
+term4 = (2*n^2 + 1);            % Proximity effect polynomial
+
+total_copper_loss2 = term1 * term2 * term3 * term4;
+
+P_dc = (I_rms^2) * n * R_dc;
+
+
 %%  Display flux result
 fprintf('\nMagnetic Flux (Φ): %.4f Weber (Wb)\n', Phi);
 %% Display Results for Input Current
@@ -157,8 +208,8 @@ fprintf('Saturation Current (I_sat): %.4f A\n', I_sat);
 
 %% Reluctance Results Display
 fprintf('\n--- Reluctance Results Display ---\n');
-fprintf('Core Reluctance (R_core): %.4e A-turns/Wb\n', R_core);
-fprintf('Air Gap Reluctance (R_airgap): %.4e A-turns/Wb\n', R_airgap);
+fprintf('Core Reluctance (R_core): %.4e A-turns/Wb\n', Rc);
+fprintf('Air Gap Reluctance (R_airgap): %.4e A-turns/Wb\n', Rg);
 fprintf('Total Reluctance (R_total): %.4e A-turns/Wb\n', R_total);
 fprintf('Total MMF (nI): %.2f A-turns\n', MMF_total);
 fprintf('Magnetic Flux (Φ): %.4e Wb\n', Phi);
@@ -168,7 +219,7 @@ fprintf('MMF Validation Error: %.2e A-turns\n', MMF_error);
 
 %% Plot Reluctance Contributions (Optional)
 figure;
-bar([R_core, R_airgap]);
+bar([Rc, Rg]);
 xticklabels({'Core', 'Air Gap'});
 ylabel('Reluctance (A-turns/Wb)');
 title('Reluctance Distribution');
@@ -224,3 +275,40 @@ fprintf('Coupling Coefficient (k): %.4f\n', k);
 if k >= 0.99
     fprintf('Note: High coupling (k ≈ 1), effective turns ratio ≈ physical ratio (n2/n1 = %.2f)\n', n2/n1);
 end
+
+ % Display result
+    fprintf('\n--- Empirical Core Loss ---\n');
+    fprintf('Total Core Loss (P_fe): %.4f W\n', P_fe);
+
+%% Display Transforner Results
+fprintf('\nTransformer Winding Loss Analysis:\n');
+fprintf('---------------------------------\n');
+fprintf('DC Resistance: %.3f mΩ\n', R_dc*1000);
+fprintf('DC Copper Loss: %.2f W\n', P_cu);
+fprintf('Skin Depth: %.3f mm\n', skin_depth*1000);
+fprintf('AC Resistance (R_ac): %.3f mΩ\n', R_ac*1000);
+fprintf('Copper Loss in Layer 1 (P_1): %.4f W\n', P_1);
+
+% Display Results
+fprintf('Multi-Layer Winding Copper Loss Analysis\n');
+fprintf('----------------------------------------\n');
+fprintf('Input Parameters:\n');
+fprintf('RMS Current (I): %.1f A\n', I_rms);
+fprintf('DC Resistance/layer (R_de): %.4f Ω\n', R_dc);
+fprintf('Number of Layers (M): %d\n\n', n);
+fprintf('Layer-wise Copper Losses:\n');
+for m = 1:n
+    fprintf('Layer %d: %.4f W\n', m, layer_copper_losses(m));
+end
+
+fprintf('\nTotal Copper Loss: %.4f W\n', total_copper_loss);
+fprintf('Common Factor (I²*h/(skin_dept)*R_de): %.4f W\n\n', common_factor);
+
+fprintf('Calculation Breakdown:\n');
+fprintf('I² = %.2f A²\n', term1);
+fprintf('(h/(skin_depth))*Rdc = %.6f Ω\n', term2);
+fprintf('M/3 = %.3f\n', term3);
+fprintf('2M² + 1 = %.1f\n\n', term4);
+
+fprintf('Total Copper Loss (P): %.5f W\n', total_copper_loss2);
+fprintf('Equivalent to: %.2f mW\n\n', total_copper_loss2*1000);

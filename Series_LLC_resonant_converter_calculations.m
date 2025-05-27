@@ -5,8 +5,8 @@ m = 12; % previous value = 8
 Q = 0.1; % previous val = 0.6
 
 Np = 1;          % Primary turns
-Ns = 100;        % Secondary turns
-Vo = 3e3;       % Output voltage in Volts
+Ns = 20;        % Secondary turns
+Vo = 4e3;       % Output voltage in Volts
 Po_max = 300;    % Max output power in Watts
 Qmax = Q;        % Quality factor (already given)
 fr = 10e3;       % Resonant frequency (Hz)
