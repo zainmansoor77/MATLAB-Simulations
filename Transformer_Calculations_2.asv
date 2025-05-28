@@ -5,21 +5,65 @@ delta_B = 1;  % peak ac flux density (ΔB) in Tesla
 beta = 1;     % material constant
 Ac = 1;       % cross-sectional core area (Ac) in m²
 lm = 1;       % core length (lm) in meters
-n1 = 1;       % primary turns n1
+no_w = 2;     % number of windings in a transformer
+n1 = 1;       % Primary turns n1
+n2 = 1;       % Secondary turns n2
+n = [n1, n2]; % number of turns in each winding
+turn_ratio = 1; % turns ratio (Ns / Np)
 lamda1 = 1;   % Volts second blance in V-sec
+I_rms1 = 1;   % RMS current of the primary winding
+I_rms2 = 1;   % RMS current of the secondary winding
+I_rms = [I_rms1, I_rms2]; % RMS current of each winding
+I_tot = 0;    % It is the sum of the rms winding currents, referred to winding 1
+I_ref_pri = zeros (1, no_w);  % It is the rms winding currents of each winding, referred to winding 1
+rho = 1;      % resistivity of the winding coil
+Ku = 1;       % Winding fill factor
+MLT = 1;      % Mean Length per Turn [m]
+Wa = 1;       % Core winding area
+Ac = 1;       % Ac is the core cross-sectional area
+P_fe = 0;     % Core loss of the transformer
+P_cu = 0;     % Copper loss of the transformer
+P_tot = 0;    % Total Power loss in W
 
+% Calculate I total
+for m = 1:no_w
+    I_ref_pri(m) = (n(m) / n(1)) * I_rms(m);
+end
+
+I_tot = sum(I_ref_pri);
+
+fprintf('Total sum of the rms winding currents, referred to winding 1: %.4f A\n', I_tot);
 % Calculate peak ac flux density (ΔB) in Tesla
+term1 = (rho  * lamda1^2 * I_tot^2) / (2 * Ku); % specification regarding the applications (ρ, Itot, λ1, Ku, Ptot)
+term2 = (MLT) / (Wa * (Ac^3) * lm);             % function of the core geometry
+term3 = 1 / (beta * K_fe);
 delta_B = lamda1 / (2 * n1 * Ac);
 
 fprintf('\npeak ac flux density (ΔB): %.4f V-sec\n', delta_B);
 
-% Calculate primary turns n1
-n1 = lamda1 / (2 * n1 * Ac);
 
-fprintf('\npeak ac flux density (ΔB): %.4f V-sec\n', delta_B);
+% Calculate primary turns n1
+n1 = lamda1 / (2 * delta_B * Ac);
+
+fprintf('primary turns n1: %.0f \n', n1);
 
 
 % Calculate core loss
 P_fe = K_fe * (delta_B)^beta * Ac * lm; % Eq. 12.1
 
 fprintf('Total Core Loss (P_fe): %.4f W\n', P_fe);
+
+% Calculate core loss
+term1 = (rho  * lamda1^2 * I_tot^2) / (4 * Ku); % specification regarding the applications (ρ, Itot, λ1, Ku, Ptot)
+term2 = (MLT) / (Wa * Ac^2);                    % function of the core geometry
+term3 = (1 / delta_B)^2;                        % function of delta_B
+
+P_cu = term1 * term2 * term3;
+
+fprintf('Total Copper Loss (P_cu): %.4f W\n', P_cu);
+
+P_tot = P_cu + P_fe;
+
+fprintf('Total Power (copper + core) Loss (P_total): %.4f W\n', P_tot);
+
+    
