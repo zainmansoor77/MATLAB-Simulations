@@ -1,0 +1,16 @@
+clc;
+
+% Parameters
+lemda = 0.1667; % m = 6
+
+%Q = 0.105; % previous val = 0.6
+
+Np = 1;          % Primary turns
+Ns = 75;        % Secondary turns
+n = Np / Ns;
+Vo = 15*1e3;       % Output voltage in Volts
+Po_max = 300;    % Max output power in Watts
+%Qmax = Q;        % Quality factor (already given)
+fr = 10e3;       % Resonant frequency (Hz)
+R0 = 30e3;
+Cr = 16 * 1e-6;
