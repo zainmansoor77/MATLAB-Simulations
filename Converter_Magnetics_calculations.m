@@ -33,7 +33,7 @@ f = 100e3;              % Frequency [Hz]
 % Calculate magnetic flux (Phi)
 Phi = B * Ac;
 
-% Compute magnetic field strength (H)
+% Compute magnetic field strength (H)c
 H = (n * i) / lm; % [A/m]
 
 % Linear model (no saturation)
@@ -313,7 +313,7 @@ fprintf('M/3 = %.3f\n', term3);
 fprintf('2M² + 1 = %.1f\n\n', term4);
 
 fprintf('Total Copper Loss (P): %.5f W\n', P_cu2);
-fprintf('Equivalent to: %.2f mW\n\n', total_copper_loss2*1000);
+fprintf('Equivalent to: %.2f mW\n\n', P_cu2 * 1000);
 
 fprintf('\nProximity Effect Ratio Analysis\n');
 fprintf('P_dc: %.2f W\n', P_dc);

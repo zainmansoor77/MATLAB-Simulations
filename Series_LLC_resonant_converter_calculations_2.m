@@ -1,18 +1,40 @@
 clc;
 
 % Parameters
-m = 12; % previous value = 8
-Q = 0.1; % previous val = 0.6
+m = 6; % previous value = 8
+%Q = 0.105; % previous val = 0.6
 
 Np = 1;          % Primary turns
 Ns = 75;        % Secondary turns
-Vo = 15e3;       % Output voltage in Volts
+Vo = 3*1e3;       % Output voltage in Volts
 Po_max = 300;    % Max output power in Watts
-Qmax = Q;        % Quality factor (already given)
+%Qmax = Q;        % Quality factor (already given)
 fr = 10e3;       % Resonant frequency (Hz)
 R0 = 30e3;
+Cr = 16 * 1e-6;
 
 Fx = linspace(0.1, 10.0, 10000); % Sweep Fx from 0 to 50
+
+% Eq. 4: Calculate Rac_min
+Rac_min = (8/pi^2) * (Np^2 / Ns^2) * (Vo^2 / Po_max);
+%Rac_min = (8/pi^2) * (Np^2 / Ns^2) * R0;
+fprintf('Rac_min = %.2f Ohms\n', Rac_min);
+
+
+% Step 1: Solve intermediate values
+%A = (Qmax * Rac_min).^2;   % From Eq. 4 -> Lr / Cr = A
+%B = 1 / (2 * pi * fr).^2;  % From Eq. 5 -> Lr * Cr = B
+
+% Step 2: Solve using symbolic substitution
+% Lr / Cr = A => Lr = A * Cr
+% (A * Cr) * Cr = B => A * Cr^2 = B => Cr = sqrt(B / A)
+%Cr = sqrt(B / A);
+%Lr = A * Cr;
+Lr = ((1 / (2 * pi * fr)).^2) / Cr;
+
+Qmax = sqrt(Lr / Cr) / Rac_min;
+Q = Qmax;
+
 
 % Equation from image
 numerator = Fx.^2 .* (m - 1);
@@ -38,21 +60,6 @@ legend('K(F_x)', sprintf('Max: K=%.3f at F_x=%.3f', K_max, Fx_max), 'Location', 
 fprintf('Maximum K = %.5f occurs at F_x = %.5f\n', K_max, Fx_max);
 
 
-% Eq. 4: Calculate Rac_min
-%Rac_min = (8/pi^2) * (Np^2 / Ns^2) * (Vo^2 / Po_max);
-Rac_min = (8/pi^2) * (Np^2 / Ns^2) * R0;
-fprintf('Rac_min = %.2f Ohms\n', Rac_min);
-
-% Step 1: Solve intermediate values
-A = (Qmax * Rac_min).^2;   % From Eq. 4 -> Lr / Cr = A
-B = 1 / (2 * pi * fr).^2;  % From Eq. 5 -> Lr * Cr = B
-
-% Step 2: Solve using symbolic substitution
-% Lr / Cr = A => Lr = A * Cr
-% (A * Cr) * Cr = B => A * Cr^2 = B => Cr = sqrt(B / A)
-Cr = sqrt(B / A);
-Lr = A * Cr;
-
 % Display results
 fprintf('Calculated Cr = %.3e F\n', Cr);
 fprintf('Calculated Lr primary = %.3e H\n', Lr);
@@ -71,6 +78,9 @@ Llk_secondary = Lr / (a^2);
 % Display results
 fprintf('Secondary Magnetizing Inductance: %.6e H\n', Lm_secondary);
 fprintf('Secondary Leakage Inductance:     %.6e H\n', Llk_secondary);
+
+
+fprintf('Qmax=%.4f\n\n',Q);
 
 fprintf('.param Cr=%.4fu\n',Cr*1e6);
 fprintf('.param Lr=%.4fu\n',Lr*1e6);

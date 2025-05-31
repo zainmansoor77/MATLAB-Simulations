@@ -11,6 +11,7 @@ Po_max = 300;    % Max output power in Watts
 Qmax = Q;        % Quality factor (already given)
 fr = 10e3;       % Resonant frequency (Hz)
 R0 = 30e3;
+Cr = 0.47 * 1e-6;
 
 Fx = linspace(0.1, 10.0, 10000); % Sweep Fx from 0 to 50
 
@@ -39,8 +40,8 @@ fprintf('Maximum K = %.5f occurs at F_x = %.5f\n', K_max, Fx_max);
 
 
 % Eq. 4: Calculate Rac_min
-%Rac_min = (8/pi^2) * (Np^2 / Ns^2) * (Vo^2 / Po_max);
-Rac_min = (8/pi^2) * (Np^2 / Ns^2) * R0;
+Rac_min = (8/pi^2) * (Np^2 / Ns^2) * (Vo^2 / Po_max);
+%Rac_min = (8/pi^2) * (Np^2 / Ns^2) * R0;
 fprintf('Rac_min = %.2f Ohms\n', Rac_min);
 
 % Step 1: Solve intermediate values
@@ -50,8 +51,9 @@ B = 1 / (2 * pi * fr).^2;  % From Eq. 5 -> Lr * Cr = B
 % Step 2: Solve using symbolic substitution
 % Lr / Cr = A => Lr = A * Cr
 % (A * Cr) * Cr = B => A * Cr^2 = B => Cr = sqrt(B / A)
-Cr = sqrt(B / A);
-Lr = A * Cr;
+%Cr = sqrt(B / A);
+%Lr = A * Cr;
+Lr = ((1 / (2 * pi * fr)).^2) / Cr;
 
 % Display results
 fprintf('Calculated Cr = %.3e F\n', Cr);
@@ -76,4 +78,5 @@ fprintf('.param Cr=%.4fu\n',Cr*1e6);
 fprintf('.param Lr=%.4fu\n',Lr*1e6);
 fprintf('.param Lm=%.4fu\n',Lm*1e6);
 fprintf('.param LSm=%.4fm\n',Lm_secondary*1e3);
+fprintf('.param LSr=%.4fm\n',Llk_secondary*1e3);
 fprintf('.param LSr=%.4fm\n',Llk_secondary*1e3);
