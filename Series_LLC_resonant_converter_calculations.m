@@ -1,15 +1,15 @@
 clc;
 
 % Parameters
-m = 12; % previous value = 8
-Q = 0.1; % previous val = 0.6
+m = 6; % previous value = 8
+Q = 0.2; % previous val = 0.6
 
 Np = 1;          % Primary turns
 Ns = 75;        % Secondary turns
 Vo = 15e3;       % Output voltage in Volts
-Po_max = 300;    % Max output power in Watts
+Po_max = 500;    % Max output power in Watts
 Qmax = Q;        % Quality factor (already given)
-fr = 10e3;       % Resonant frequency (Hz)
+fr = 20e3;       % Resonant frequency (Hz)
 R0 = 30e3;
 
 Fx = linspace(0.1, 10.0, 10000); % Sweep Fx from 0 to 50
@@ -39,8 +39,8 @@ fprintf('Maximum K = %.5f occurs at F_x = %.5f\n', K_max, Fx_max);
 
 
 % Eq. 4: Calculate Rac_min
-%Rac_min = (8/pi^2) * (Np^2 / Ns^2) * (Vo^2 / Po_max);
-Rac_min = (8/pi^2) * (Np^2 / Ns^2) * R0;
+Rac_min = (8/pi^2) * (Np^2 / Ns^2) * (Vo^2 / Po_max);
+%Rac_min = (8/pi^2) * (Np^2 / Ns^2) * R0;
 fprintf('Rac_min = %.2f Ohms\n', Rac_min);
 
 % Step 1: Solve intermediate values

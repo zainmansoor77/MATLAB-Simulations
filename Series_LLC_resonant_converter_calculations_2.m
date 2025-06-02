@@ -1,17 +1,17 @@
 clc;
 
 % Parameters
-m = 6; % previous value = 8
-%Q = 0.105; % previous val = 0.6
+m = 8; % previous value = 8
+Q = 0.105; % previous val = 0.6
 
 Np = 1;          % Primary turns
 Ns = 75;        % Secondary turns
-Vo = 3*1e3;       % Output voltage in Volts
+Vo = 15*1e3;       % Output voltage in Volts
 Po_max = 300;    % Max output power in Watts
-%Qmax = Q;        % Quality factor (already given)
-fr = 10e3;       % Resonant frequency (Hz)
+Qmax = Q;        % Quality factor (already given)
+fr = 20e3;       % Resonant frequency (Hz)
 R0 = 30e3;
-Cr = 16 * 1e-6;
+Cr = 6.8 * 1e-6;
 
 Fx = linspace(0.1, 10.0, 10000); % Sweep Fx from 0 to 50
 
@@ -32,8 +32,8 @@ fprintf('Rac_min = %.2f Ohms\n', Rac_min);
 %Lr = A * Cr;
 Lr = ((1 / (2 * pi * fr)).^2) / Cr;
 
-Qmax = sqrt(Lr / Cr) / Rac_min;
-Q = Qmax;
+%Qmax = sqrt(Lr / Cr) / Rac_min;
+%Q = Qmax;
 
 
 % Equation from image
