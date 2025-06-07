@@ -2,7 +2,7 @@ clc;
 
 % Parameters
 m = 6; % previous value = 8
-Q = 0.2; % previous val = 0.6
+Q = 0.125; % previous val = 0.6
 
 Np = 1;          % Primary turns
 Ns = 75;        % Secondary turns
@@ -45,7 +45,9 @@ fprintf('Rac_min = %.2f Ohms\n', Rac_min);
 
 % Step 1: Solve intermediate values
 A = (Qmax * Rac_min).^2;   % From Eq. 4 -> Lr / Cr = A
+fprintf('A = %0.3f \n', A);
 B = 1 / (2 * pi * fr).^2;  % From Eq. 5 -> Lr * Cr = B
+fprintf('B = %0.3f \n', B);
 
 % Step 2: Solve using symbolic substitution
 % Lr / Cr = A => Lr = A * Cr

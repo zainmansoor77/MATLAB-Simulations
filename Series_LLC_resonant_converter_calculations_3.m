@@ -1,20 +1,20 @@
 clc;
 
 % Parameters
-lambda = 0.2; % m = 8
+lambda = 0.1667; % m = 8
 
-Q = 0.1; % previous val = 0.6
+Q = 0.12; % previous val = 0.6
 
 Np = 1;           % Primary turns
 Ns = 75;          % Secondary turns
 n = Np / Ns;
 Vo = 15*1e3;      % Output voltage in Volts
-Po_max = 500;     % Max output power in Watts
+Po_max = 400;     % Max output power in Watts
 %Qmax = Q;        % Quality factor (already given)
 fr = 20e3;        % Resonant frequency (Hz)
 fsw = 50e3;       % Switching Frequency (Hz)
 R0 = 30e3;
-Cr = 0.5 * 1e-6;
+Cr = 1 * 1e-6;
 M_max = 1.0;
 M_min = 0.75;
 
