@@ -3,7 +3,7 @@ clc;
 Turn_ratio = 75;                       % Ns / Np = 75
 Lm = 526.5557 * 1e-6;                  % Lm = 526.5557uH
 lamda = 1.81913  * 1e-3;               % lamda = 1.81913mV-s
-delta_B = 0.2;                         % 0.2T peak-to-peak flux density
+delta_B = 0.25;                         % 0.2T peak-to-peak flux density
 min_Np = 0;                            % Minimum turns to avoid core saturation
 Np = 0;                                % Number of turns in primary side
 Lm_ungapped = 0;                       % Ungapped inductance at the Minimum turns, to avoid core saturation
@@ -13,7 +13,7 @@ count = 0;                             % By default it should be 0, otherwise it
 U0 = 4 * pi * 1e-7;                    % Permeability of free space [H/m]
 Lg = 0.00;
 
-%% %{
+% %{
 
 % EE160/80/40 core parameters (N87 material)
 
@@ -26,22 +26,37 @@ Duty_Cycle = 0.5;                      % Assumed full-bridge square wave (duty =
 %Ur = 1970;
 
 
-%% %}
+% %}
 
-%% %{
+%{
 
-% EE160/80/40 core parameters (N87 material)
+% U93/76/30 core parameters (3C90 or 3C94 material)
 
-Ae = 1.64 * 1e-3;                      % Effective cross-sectional area = 1640mm^2 or (1.64 * 1e-3)m^2
-le = 0.381;                            % Effective magnetic length path = 381mm or 0.381m
-Ve = 6.24 * 1e-4;                      % Effective core volume = 623930mm^3 or (6.24 * 1e-4)m^3
-AL = 10700 * 1e-9;                     % Ungapped AL(N87 material) = 10700nH / turn^2
+Ae = 0.84 * 1e-3;                      % Effective cross-sectional area = 840mm^2 or (0.84 * 1e-3)m^2
+le = 0.354;                            % Effective magnetic length path = 354mm or 0.354m
+Ve = 2.97 * 1e-4;                      % Effective core volume = 297000mm^3 or (2.97 * 1e-4)m^3
+AL = 6400 * 1e-9;                      % Ungapped AL(N87 material) = 6400nH / turn^2
 Fsw = 50 * 1e3;                        % Switching Frequency of 50KHz
 Duty_Cycle = 0.5;                      % Assumed full-bridge square wave (duty = 50%).
 %Ur = 1970;
 
 
-%% %}
+%}
+
+%{
+
+% U126/91/20 core parameters (3C90 or 3C94 material)
+
+Ae = 0.56 * 1e-3;                     % Effective cross-sectional area = 560mm^2 or (0.56 * 1e-3)m^2
+le = 0.48;                            % Effective magnetic length path = 480mm or 0.48m
+Ve = 2.688 * 1e-4;                    % Effective core volume = 268800mm^3 or (2.688 * 1e-4)m^3
+AL = 3000 * 1e-9;                     % Ungapped AL(N87 material) = 3000nH / turn^2
+Fsw = 50 * 1e3;                       % Switching Frequency of 50KHz
+Duty_Cycle = 0.5;                     % Assumed full-bridge square wave (duty = 50%).
+%Ur = 1970;
+
+
+%}
 
 %% Minimum number of turns to avoid core saturation
 
@@ -72,7 +87,7 @@ end
 
 fprintf('\n');
 
-if ( (Lm - (AL * ((i - 2) ^ 2))) < (20 * 1e-6) ) || ( (Lm_ungapped - Lm) < (20 * 1e-6) )
+if ( abs(Lm - (AL * ((i - 2) ^ 2))) < (20 * 1e-6) ) || ( abs(Lm_ungapped - Lm) < (20 * 1e-6) )
     fprintf('No Air Gap required \n');
 else
     count = 1;
