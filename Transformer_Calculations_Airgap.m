@@ -13,6 +13,8 @@ count = 0;                             % By default it should be 0, otherwise it
 U0 = 4 * pi * 1e-7;                    % Permeability of free space [H/m]
 Lg = 0.00;
 
+% Best results at EE160 (ungapped Np = 7, Lm = 524.3uH), U93 (Ungapped Np = 9, Lm = 518.4uH), and U126 (ungapped Np = 13, Lm = 507uH)
+
 % %{
 
 % EE160/80/40 core parameters (N87 material)
@@ -28,9 +30,26 @@ Duty_Cycle = 0.5;                      % Assumed full-bridge square wave (duty =
 
 % %}
 
-%{
+ %{
 
-% U93/76/30 core parameters (3C90 or 3C94 material)
+% E100/60/28 core parameters (3C95  material)
+
+Ae = 0.738 * 1e-3;                      % Effective cross-sectional area = 738mm^2 or (0.738 * 1e-3)m^2
+le = 0.274;                            % Effective magnetic length path = 274mm or 0.274m
+Ve = 2.02 * 1e-4;                      % Effective core volume = 202000 mm^3 or (2.02 * 1e-4)m^3
+AL = 9010  * 1e-9;                     % Ungapped AL(N87 material) = 9010 nH / turn^2
+Fsw = 50 * 1e3;                        % Switching Frequency of 50KHz
+Duty_Cycle = 0.5;                      % Assumed full-bridge square wave (duty = 50%).
+%Ur = 1970;
+
+
+ %}
+
+
+
+ %{
+
+ % U93/76/30 core parameters (3C90 or 3C94 material)
 
 Ae = 0.84 * 1e-3;                      % Effective cross-sectional area = 840mm^2 or (0.84 * 1e-3)m^2
 le = 0.354;                            % Effective magnetic length path = 354mm or 0.354m
@@ -41,9 +60,9 @@ Duty_Cycle = 0.5;                      % Assumed full-bridge square wave (duty =
 %Ur = 1970;
 
 
-%}
+ %}
 
-%{
+ %{
 
 % U126/91/20 core parameters (3C90 or 3C94 material)
 
@@ -56,7 +75,7 @@ Duty_Cycle = 0.5;                     % Assumed full-bridge square wave (duty = 
 %Ur = 1970;
 
 
-%}
+ %}
 
 %% Minimum number of turns to avoid core saturation
 
@@ -112,8 +131,10 @@ if count == 1
     delta_B = lamda / (Np * Ae);
     fprintf('The Maximum B we will get is: %.2f T \n', delta_B);
     %Lg = (((Np ^ 2) * U0 * Ae) / Lm);
+    a = (((Np ^ 2) * U0 * Ae) / (Lm));
+    b = (le / Ur);
     Lg = (((Np ^ 2) * U0 * Ae) / (Lm)) - (le / Ur);
-    fprintf('The air gap required is %.03f mm \n', Lg * 1e3);
+    fprintf('The air gap required is %.04f mm \n', Lg * 1e3);
     
     fprintf('\n');
 end
