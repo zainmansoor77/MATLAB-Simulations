@@ -13,12 +13,12 @@ count = 0;                             % By default it should be 0, otherwise it
 U0 = 4 * pi * 1e-7;                    % Permeability of free space [H/m]
 Lg = 0.00;
 
-% Best results at EE160 (ungapped Np = 7), U93 (Ungapped Np = 9, Lm =
-% 518.4uH), and U126 (ungapped Np = 
+% Best results at EE160 (ungapped Np = 7, Lm = 524.3uH), U93 (Ungapped Np = 9, Lm = 518.4uH), U126 (ungapped Np = 13, Lm = 507uH)
+% U130 (ungapped Np = 9, 
 
  %{
 
-% EE160/80/40 core parameters (N87 material)
+% E160/80/40 core parameters (N87 material)
 
 Ae = 1.64 * 1e-3;                      % Effective cross-sectional area = 1640mm^2 or (1.64 * 1e-3)m^2
 le = 0.381;                            % Effective magnetic length path = 381mm or 0.381m
@@ -38,7 +38,7 @@ Duty_Cycle = 0.5;                      % Assumed full-bridge square wave (duty =
 Ae = 0.738 * 1e-3;                      % Effective cross-sectional area = 738mm^2 or (0.738 * 1e-3)m^2
 le = 0.274;                            % Effective magnetic length path = 274mm or 0.274m
 Ve = 2.02 * 1e-4;                      % Effective core volume = 202000 mm^3 or (2.02 * 1e-4)m^3
-AL = 9010  * 1e-9;                     % Ungapped AL(N87 material) = 9010 nH / turn^2
+AL = 9010  * 1e-9;                     % Ungapped AL(3C95 material) = 9010 nH / turn^2
 Fsw = 50 * 1e3;                        % Switching Frequency of 50KHz
 Duty_Cycle = 0.5;                      % Assumed full-bridge square wave (duty = 50%).
 %Ur = 1970;
@@ -55,7 +55,7 @@ Duty_Cycle = 0.5;                      % Assumed full-bridge square wave (duty =
 Ae = 0.84 * 1e-3;                      % Effective cross-sectional area = 840mm^2 or (0.84 * 1e-3)m^2
 le = 0.354;                            % Effective magnetic length path = 354mm or 0.354m
 Ve = 2.97 * 1e-4;                      % Effective core volume = 297000mm^3 or (2.97 * 1e-4)m^3
-AL = 6400 * 1e-9;                      % Ungapped AL(N87 material) = 6400nH / turn^2
+AL = 6400 * 1e-9;                      % Ungapped AL(3C90 or 3C94 material) = 6400nH / turn^2
 Fsw = 50 * 1e3;                        % Switching Frequency of 50KHz
 Duty_Cycle = 0.5;                      % Assumed full-bridge square wave (duty = 50%).
 %Ur = 1970;
@@ -63,14 +63,29 @@ Duty_Cycle = 0.5;                      % Assumed full-bridge square wave (duty =
 
  %}
 
-% %{
+ %{
 
 % U126/91/20 core parameters (3C90 or 3C94 material)
 
 Ae = 0.56 * 1e-3;                     % Effective cross-sectional area = 560mm^2 or (0.56 * 1e-3)m^2
 le = 0.48;                            % Effective magnetic length path = 480mm or 0.48m
 Ve = 2.688 * 1e-4;                    % Effective core volume = 268800mm^3 or (2.688 * 1e-4)m^3
-AL = 3000 * 1e-9;                     % Ungapped AL(N87 material) = 3000nH / turn^2
+AL = 3000 * 1e-9;                     % Ungapped AL(3C90 or 3C94 material) = 3000nH / turn^2
+Fsw = 50 * 1e3;                       % Switching Frequency of 50KHz
+Duty_Cycle = 0.5;                     % Assumed full-bridge square wave (duty = 50%).
+%Ur = 1970;
+
+
+ %}
+
+% %{
+
+% U130/60/25 core parameters (N88 material)
+
+Ae = 0.93 * 1e-3;                     % Effective cross-sectional area = 930mm^2 or (0.93 * 1e-3)m^2
+le = 0.316;                            % Effective magnetic length path = 316mm or 0.316m
+Ve = 2.95 * 1e-4;                    % Effective core volume = 295000mm^3 or (2.95 * 1e-4)m^3
+AL = 6400 * 1e-9;                     % Ungapped AL(N88 material) = 6400nH / turn^2
 Fsw = 50 * 1e3;                       % Switching Frequency of 50KHz
 Duty_Cycle = 0.5;                     % Assumed full-bridge square wave (duty = 50%).
 %Ur = 1970;
