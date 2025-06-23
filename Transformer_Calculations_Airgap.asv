@@ -1,7 +1,10 @@
 clc;
 
 Turn_ratio = 75;                       % Ns / Np = 75
-Lm = 526.5557 * 1e-6;                  % Lm = 526.5557uH
+Lm_Primary = 526.5557 * 1e-6;          % Lm_Primary 
+Lstr_Primary = 65.819 * 1e-6;          % Lstr_Primary (leakage)
+Lm_Secondary = 2961.8756 * 1e-3;       % Lm_Secondary 
+Lstr_Secondary = 370.2345 * 1e-3;      % Lstr_Secondary (leakage)
 lamda = 1.81913  * 1e-3;               % lamda = 1.81913mV-s
 delta_B = 0.25;                         % 0.2T peak-to-peak flux density
 min_Np = 0;                            % Minimum turns to avoid core saturation
@@ -12,11 +15,15 @@ lm_ungapped_Le = 0;
 count = 0;                             % By default it should be 0, otherwise it would skip the part that verify that no air gap is required
 U0 = 4 * pi * 1e-7;                    % Permeability of free space [H/m]
 Lg = 0.00;
+L1 = 0.00;                             % L1 = Lm_Primary + Lstr_primary
+L2 = 0.00;                             % L2 = Lm_Secondary + Lstr_Secondary
+M = 0.00;                              % Mutual Inductance M = sqrt(Lm_Primary * Lm_Secondary)
+K = 0.00;                              % Coupling Coefficient K = M / sqrt(L1 * L2) 
 
-% Best results at EE160 (ungapped Np = 7, Lm = 524.3uH), U93 (Ungapped Np = 9, Lm = 518.4uH), U126 (ungapped Np = 13, Lm = 507uH)
-% U130 (ungapped Np = 9, 
+% Best results at E160 (ungapped Np = 7, Lm_Primary = 524.3uH), U93 (Ungapped Np = 9, Lm_Primary = 518.4uH), U126 (ungapped Np = 13, Lm_Primary = 507uH),
+% and U130 (ungapped Np = 9, Lm_Primary = 518.4uH)
 
- %{
+% %{
 
 % E160/80/40 core parameters (N87 material)
 
@@ -29,7 +36,7 @@ Duty_Cycle = 0.5;                      % Assumed full-bridge square wave (duty =
 %Ur = 1970;
 
 
- %}
+% %}
 
  %{
 
@@ -78,7 +85,7 @@ Duty_Cycle = 0.5;                     % Assumed full-bridge square wave (duty = 
 
  %}
 
-% %{
+ %{
 
 % U130/60/25 core parameters (N88 material)
 
@@ -91,7 +98,7 @@ Duty_Cycle = 0.5;                     % Assumed full-bridge square wave (duty = 
 %Ur = 1970;
 
 
-% %}
+ %}
 
 %% Minimum number of turns to avoid core saturation
 
@@ -111,7 +118,7 @@ fprintf('Magneuizing inductance at the Minimum Np using Le: %.3f uH \n', lm_unga
 fprintf('\n');
 
 for i = ceil(min_Np):100
-    if (Lm - Lm_ungapped) < 0
+    if (Lm_Primary - Lm_ungapped) < 0
         break;
     end
     
@@ -122,7 +129,7 @@ end
 
 fprintf('\n');
 
-if ( abs(Lm - (AL * ((i - 2) ^ 2))) < (20 * 1e-6) ) || ( abs(Lm_ungapped - Lm) < (20 * 1e-6) )
+if ( abs(Lm_Primary - (AL * ((i - 2) ^ 2))) < (20 * 1e-6) ) || ( abs(Lm_ungapped - Lm_Primary) < (20 * 1e-6) )
     fprintf('No Air Gap required \n');
 else
     count = 1;
@@ -131,11 +138,11 @@ end
 
 fprintf('\n');
 
-if (count == 0) && ( (Lm - (AL * ((i - 2) ^ 2))) < (20 * 1e-6) )
+if (count == 0) && ( (Lm_Primary - (AL * ((i - 2) ^ 2))) < (20 * 1e-6) )
     Np = i - 2;
     fprintf('Np = %d ... Magnetizing inductance at this Np: %.3f uH \n', Np, (AL * ((i - 2) ^ 2)) * 1e6);
 
-elseif (count == 0) && ( (Lm_ungapped - Lm) < (20 * 1e-6) )
+elseif (count == 0) && ( (Lm_ungapped - Lm_Primary) < (20 * 1e-6) )
     Np = i - 1;
     fprintf('Np = %d ... Magnetzing inductance at this Np: %.3f uH \n', Np, Lm_ungapped * 1e6);
 end
@@ -146,11 +153,20 @@ if count == 1
     fprintf('Np = %d ... Magnetizing Ungapped inductance at this Np: %.3f uH \n', Np, Lm_ungapped * 1e6);
     delta_B = lamda / (Np * Ae);
     fprintf('The Maximum B we will get is: %.2f T \n', delta_B);
-    %Lg = (((Np ^ 2) * U0 * Ae) / Lm);
-    a = (((Np ^ 2) * U0 * Ae) / (Lm));
+    %Lg = (((Np ^ 2) * U0 * Ae) / Lm_Primary);
+    a = (((Np ^ 2) * U0 * Ae) / (Lm_Primary));
     b = (le / Ur);
-    Lg = (((Np ^ 2) * U0 * Ae) / (Lm)) - (le / Ur);
+    Lg = (((Np ^ 2) * U0 * Ae) / (Lm_Primary)) - (le / Ur);
     fprintf('The air gap required is %.04f mm \n', Lg * 1e3);
     
     fprintf('\n');
 end
+
+Lm_Primary = Lm_
+L1 = Lm_Primary + Lstr_Primary;
+L2 = Lm_Secondary + Lstr_Secondary;
+M = sqrt(Lm_Primary * Lm_Secondary);
+K = M / sqrt(L1 * L2);
+
+fprintf('\n');
+fprintf('The Coupling Factor K is %.03f \n', K);
