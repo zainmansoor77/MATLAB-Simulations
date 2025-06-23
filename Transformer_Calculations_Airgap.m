@@ -179,3 +179,4 @@ K = M / sqrt(L1 * L2);
 
 fprintf('\n');
 fprintf('The Coupling Factor K is %.03f \n', K);
+75 * 7
