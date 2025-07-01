@@ -7,7 +7,7 @@ Q = 0.125; % previous val = 0.6
 Np = 1;          % Primary turns
 Ns = 75;        % Secondary turns
 Vo = 15e3;       % Output voltage in Volts
-Po_max = 490;    % Max output power in Watts
+Po_max = 420;    % Max output power in Watts
 Qmax = Q;        % Quality factor (already given)
 fr = 20e3;       % Resonant frequency (Hz)
 R0 = 30e3;
