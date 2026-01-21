@@ -1,0 +1,50 @@
+clc;
+
+% Integrator
+num = [1];
+den = [1 0];
+w = logspace(-3,3);
+g = freqs(num, den, w);
+%semilogx(w, 20 * log10(abs(g))), grid, xlabel("w"), ylabel("dB Gain");
+
+% Proportrional
+Kp = 1;
+num = [Kp];
+den = [1];
+w = logspace(-3,3);
+g = freqs(num, den, w);
+%semilogx(w, 20 * log10(abs(g))), grid, xlabel("w"), ylabel("dB Gain");
+
+% Derivative
+num = [1 0];
+den = [1 10];
+w = logspace(-3,3);
+g = freqs(num, den, w);
+%semilogx(w, 20 * log10(abs(g))), grid, xlabel("w"), ylabel("dB Gain");
+
+% Controller (PID)
+Ki = 0.2;
+Kp = 0.01;
+Kd = 0.1;
+a = 800;
+nc = [(Kp+Kd) (Ki+Kp*a) (Ki*a)];
+dc = [1 a 0];
+w = logspace(-3, 3);
+gc = freqs(nc, dc, w);
+subplot(2,1,1), semilogx(w, 20 * log10(abs(gc)),'k'), grid, xlabel("w"), ylabel("dB Gain"),title("Controller"), grid on;hold on;pause;
+
+% Plant
+np = [2.2];
+dp = conv(conv([0.1 1], [0.4 1]), [1.2 1]);
+gp = freqs(np, dp, w);
+subplot(2,1,1), semilogx(w, 20 * log10(abs(gp)),'r'), grid, xlabel("w"), ylabel("dB Gain"),title("Plant"), grid on;hold on;pause;
+
+% Plant + Controller
+gpc = freqs(conv(nc,np), conv(dc,dp),w);
+subplot(2,1,1), semilogx(w, 20 * log10(abs(gpc)),'b'), grid, xlabel("w"), ylabel("dB Gain"),title("Plant + Controller"), grid on;hold on;pause;
+
+% Step Response of a Closed Loop System
+[ns,ds] = feedback(conv(nc,dp), conv(dc,dp), [1], [1]);
+subplot(2,1,2), step(ns,ds,15);grid on;
+%subplot(2,1,2), step(ns,ds,100);
+
