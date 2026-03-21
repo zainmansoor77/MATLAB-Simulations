@@ -47,4 +47,3 @@ subplot(2,1,1), semilogx(w, 20 * log10(abs(gpc)),'b'), grid, xlabel("w"), ylabel
 [ns,ds] = feedback(conv(nc,dp), conv(dc,dp), [1], [1]);
 subplot(2,1,2), step(ns,ds,15);grid on;
 %subplot(2,1,2), step(ns,ds,100);
-
